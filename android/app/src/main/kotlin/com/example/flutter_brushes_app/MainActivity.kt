@@ -1,4 +1,4 @@
-package com.example.flutter_brushes_app
+package com.example.flutter_brushes
 
 import io.flutter.embedding.android.FlutterActivity
 

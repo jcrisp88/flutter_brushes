@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_brushes_app/providers/brush_values_provider.dart';
+import 'package:flutter_brushes/providers/brush_values_provider.dart';
 import 'package:image/image.dart' as imagec;
 import 'package:provider/provider.dart';
 
@@ -34,7 +34,8 @@ class _CanvasHostState extends State<CanvasHost> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final _brushesValues = Provider.of<BrushValuesProvider>(context, listen: false);
+    final _brushesValues =
+        Provider.of<BrushValuesProvider>(context, listen: false);
 
     CanvasRelatedData.brushWidth = _brushesValues.brushWidth / 3.0;
     CanvasRelatedData.brushOpacity = _brushesValues.brushOpacity;
@@ -42,7 +43,8 @@ class _CanvasHostState extends State<CanvasHost> {
     CanvasRelatedData.brushIndex = _brushesValues.indexBrush;
 
     /// perform a conversion from fractional value to whole numbers
-    pointToSkip = int.parse(((_brushesValues.inkAmount * 100).toStringAsFixed(0)));
+    pointToSkip =
+        int.parse(((_brushesValues.inkAmount * 100).toStringAsFixed(0)));
 
     CanvasRelatedData.renderNewBrush();
   }
@@ -59,14 +61,17 @@ class _CanvasHostState extends State<CanvasHost> {
     Canvas canvas = Canvas(recorder);
     var size = context.size;
     painter.paint(canvas, size);
-    return await recorder.endRecording().toImage(size.width.floor(), size.height.floor());
+    return await recorder
+        .endRecording()
+        .toImage(size.width.floor(), size.height.floor());
   }
 
   Widget _buildImage() {
     final _brushesValues = Provider.of<BrushValuesProvider>(context);
 
     CanvasEditor editor = CanvasEditor();
-    if (_brushesValues.renderedImage != null) editor.background(_brushesValues.renderedImage);
+    if (_brushesValues.renderedImage != null)
+      editor.background(_brushesValues.renderedImage);
     return GestureDetector(
       onPanDown: (detailData) {
         if (!CanvasRelatedData.isRenderinNewBrush) {
@@ -92,7 +97,8 @@ class _CanvasHostState extends State<CanvasHost> {
           //Clear points already drawed
           editor.clear();
           //set the generated image as background
-          if (_brushesValues.renderedImage != null) editor.background(_brushesValues.renderedImage);
+          if (_brushesValues.renderedImage != null)
+            editor.background(_brushesValues.renderedImage);
         });
       },
       child: CustomPaint(
@@ -114,7 +120,11 @@ class CanvasRelatedData {
   static int brushIndex = 0;
   static int lastIndex;
   //update with brush names
-  static List<String> bushNames = ['images/marker_brush.png', 'images/spray_brush.png', 'images/crayon_brush.png'];
+  static List<String> bushNames = [
+    'images/marker_brush.png',
+    'images/spray_brush.png',
+    'images/crayon_brush.png'
+  ];
 
   ///holds brush rendered images with actul values
   static List<ui.Image> brushesImagens = new List(bushNames.length);
@@ -146,9 +156,12 @@ class CanvasRelatedData {
       lastIndex = brushIndex;
     }
 
-    int newWidth = (fullSizeBrushImage.width * CanvasRelatedData.brushWidth).floor();
-    int newHeight = (fullSizeBrushImage.height * CanvasRelatedData.brushWidth).floor();
-    imagec.Image resizedBrushImage = imagec.copyResize(fullSizeBrushImage, height: newHeight, width: newWidth);
+    int newWidth =
+        (fullSizeBrushImage.width * CanvasRelatedData.brushWidth).floor();
+    int newHeight =
+        (fullSizeBrushImage.height * CanvasRelatedData.brushWidth).floor();
+    imagec.Image resizedBrushImage = imagec.copyResize(fullSizeBrushImage,
+        height: newHeight, width: newWidth);
 
     var pixels = resizedBrushImage.getBytes();
     for (int i = 0, len = pixels.length; i < len; i += 4) {
@@ -161,7 +174,8 @@ class CanvasRelatedData {
       //alpha 0=0% 1=100%
       pixels[i + 3] = (pixels[i + 3] * CanvasRelatedData.brushOpacity).floor();
     }
-    ui.Codec codec = await ui.instantiateImageCodec(imagec.encodePng(resizedBrushImage));
+    ui.Codec codec =
+        await ui.instantiateImageCodec(imagec.encodePng(resizedBrushImage));
     ui.FrameInfo frameInfo = await codec.getNextFrame();
     brushesImagens[brushIndex] = frameInfo.image;
     //now than we have the brush image we can start drawing again
@@ -202,9 +216,19 @@ class CanvasEditor extends CustomPainter {
     }
     for (Offset offset in _points) {
       ///Draws the brush in every point
-      Offset center =
-          Offset(offset.dx - CanvasRelatedData.brushesImagens[CanvasRelatedData.brushIndex].width / 2, offset.dy - CanvasRelatedData.brushesImagens[CanvasRelatedData.brushIndex].height / 2);
-      canvas.drawImage(CanvasRelatedData.brushesImagens[CanvasRelatedData.brushIndex], center, painter);
+      Offset center = Offset(
+          offset.dx -
+              CanvasRelatedData
+                      .brushesImagens[CanvasRelatedData.brushIndex].width /
+                  2,
+          offset.dy -
+              CanvasRelatedData
+                      .brushesImagens[CanvasRelatedData.brushIndex].height /
+                  2);
+      canvas.drawImage(
+          CanvasRelatedData.brushesImagens[CanvasRelatedData.brushIndex],
+          center,
+          painter);
     }
   }
 

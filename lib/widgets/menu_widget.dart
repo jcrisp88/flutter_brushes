@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_brushes_app/providers/brush_values_provider.dart';
-import 'package:flutter_brushes_app/widgets/brush_type.dart';
+import 'package:flutter_brushes/providers/brush_values_provider.dart';
+import 'package:flutter_brushes/widgets/brush_type.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +24,8 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
 
   @override
   void didChangeDependencies() {
-    final _brushValues = Provider.of<BrushValuesProvider>(context, listen: false);
+    final _brushValues =
+        Provider.of<BrushValuesProvider>(context, listen: false);
 
     _brushWidth = _brushValues.brushWidth;
     _brushOpacity = _brushValues.brushOpacity;
@@ -103,7 +104,8 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
 
   /// Function that contains the menu and all its options
   Widget _menu({BuildContext context}) {
-    final _brushValues = Provider.of<BrushValuesProvider>(context, listen: false);
+    final _brushValues =
+        Provider.of<BrushValuesProvider>(context, listen: false);
 
     return Container(
       margin: EdgeInsets.only(right: 16.0),
@@ -222,7 +224,8 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
   }
 
   /// Function that contains the alert dialog that allows the user to change the color of the brush
-  Future _colorPicker({BuildContext context, @required Color colorSelect}) async {
+  Future _colorPicker(
+      {BuildContext context, @required Color colorSelect}) async {
     Color _colorSelected;
 
     return await showDialog(
@@ -244,7 +247,8 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
           FlatButton(
             child: Text('Go it'),
             onPressed: () {
-              final _brushValues = Provider.of<BrushValuesProvider>(context, listen: false);
+              final _brushValues =
+                  Provider.of<BrushValuesProvider>(context, listen: false);
 
               if (_colorSelected != null) {
                 setState(() {

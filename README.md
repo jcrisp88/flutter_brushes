@@ -1,4 +1,4 @@
-# flutter_brushes_app
+# flutter_brushes
 
 A new Flutter application.
 

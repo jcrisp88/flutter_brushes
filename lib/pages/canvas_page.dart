@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_brushes_app/widgets/canvas_host.dart';
-import 'package:flutter_brushes_app/widgets/menu_widget.dart';
+import 'package:flutter_brushes/widgets/canvas_host.dart';
+import 'package:flutter_brushes/widgets/menu_widget.dart';
 
 class CanvasPage extends StatefulWidget {
   static final routeName = 'canvasPage';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_brushes_app/pages/canvas_page.dart';
-import 'package:flutter_brushes_app/providers/brush_values_provider.dart';
+import 'package:flutter_brushes/pages/canvas_page.dart';
+import 'package:flutter_brushes/providers/brush_values_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       create: (_) => BrushValuesProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter brushes app',
+        title: 'Flutter brushes',
         initialRoute: CanvasPage.routeName,
         routes: {
           CanvasPage.routeName: (_) => CanvasPage(),

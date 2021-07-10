@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "flutter_brushes_app",
+            "name": "flutter_brushes",
             "request": "launch",
             "type": "dart"
         }

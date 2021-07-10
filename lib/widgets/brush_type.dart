@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_brushes_app/providers/brush_values_provider.dart';
+import 'package:flutter_brushes/providers/brush_values_provider.dart';
 import 'package:provider/provider.dart';
 
 class BrushType extends StatefulWidget {
@@ -43,7 +43,8 @@ class _BrushTypeState extends State<BrushType> {
   }
 
   Future _brushSelectorMenu({@required BuildContext context}) async {
-    final _brushValues = Provider.of<BrushValuesProvider>(context, listen: false);
+    final _brushValues =
+        Provider.of<BrushValuesProvider>(context, listen: false);
 
     Widget _content({
       @required int value,

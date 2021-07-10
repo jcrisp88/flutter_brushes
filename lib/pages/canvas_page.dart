@@ -1,31 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_brushes/widgets/canvas_host.dart';
+import 'package:flutter_brushes/canvas/canvas_host.dart';
 import 'package:flutter_brushes/widgets/menu_widget.dart';
 
-class CanvasPage extends StatefulWidget {
+class CanvasPage extends StatelessWidget {
   static final routeName = 'canvasPage';
 
-  const CanvasPage({Key key}) : super(key: key);
+  const CanvasPage({Key? key}) : super(key: key);
 
-  @override
-  _CanvasPageState createState() => _CanvasPageState();
-}
-
-class _CanvasPageState extends State<CanvasPage> {
   @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       body: Stack(
         children: [
           Container(
-            height: height,
-            width: width,
+            height: double.maxFinite,
+            width: double.maxFinite,
             child: CanvasHost(),
           ),
-          MenuWidget()
+          MenuWidget(),
         ],
       ),
     );

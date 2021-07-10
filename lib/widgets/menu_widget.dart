@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_brushes/dialog/color_dialog.dart';
 import 'package:flutter_brushes/providers/brush_values_provider.dart';
 import 'package:flutter_brushes/widgets/brush_type.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 
 class MenuWidget extends StatefulWidget {
@@ -10,30 +10,12 @@ class MenuWidget extends StatefulWidget {
 }
 
 class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
-  AnimationController _controller;
-  Animation _animHeght;
-  Animation _animWidth;
+  late AnimationController _controller;
+  late Animation _animHeight;
+  late Animation _animWidth;
 
   /// Stores the menu status if it is open or closed
   bool _menuOpen = false;
-
-  double _brushWidth;
-  double _brushOpacity;
-  double _inkAmount;
-  Color _brushColorPicker;
-
-  @override
-  void didChangeDependencies() {
-    final _brushValues =
-        Provider.of<BrushValuesProvider>(context, listen: false);
-
-    _brushWidth = _brushValues.brushWidth;
-    _brushOpacity = _brushValues.brushOpacity;
-    _inkAmount = _brushValues.inkAmount;
-    _brushColorPicker = _brushValues.colorPicker;
-
-    super.didChangeDependencies();
-  }
 
   @override
   void initState() {
@@ -44,12 +26,13 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
     _animWidth = Tween(begin: 0.0, end: 250.0).animate(
       CurvedAnimation(parent: _controller, curve: Interval(0.0, 0.25)),
     );
-    _animHeght = Tween(begin: 0.0, end: 250.0).animate(
+    _animHeight = Tween(begin: 0.0, end: 250.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Interval(0.25, 1.0),
       ),
     );
+
     super.initState();
   }
 
@@ -61,6 +44,8 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final _brushValues = context.watch<BrushValuesProvider>();
+
     return SafeArea(
       child: AnimatedBuilder(
         animation: _controller,
@@ -82,18 +67,21 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
                       color: Colors.black54,
                     ),
                     onTap: () {
-                      if (!_menuOpen) {
-                        _menuOpen = true;
+                      setState(() {
+                        _menuOpen = !_menuOpen;
+                      });
+
+                      if (_menuOpen)
                         _controller.forward();
-                      } else if (_menuOpen) {
+                      else
                         _controller.reverse();
-                        _menuOpen = false;
-                      }
-                      setState(() {});
                     },
                   ),
                 ),
-                _menu(context: context),
+                _menu(
+                  context: context,
+                  brushValues: _brushValues,
+                ),
               ],
             ),
           );
@@ -103,14 +91,14 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
   }
 
   /// Function that contains the menu and all its options
-  Widget _menu({BuildContext context}) {
-    final _brushValues =
-        Provider.of<BrushValuesProvider>(context, listen: false);
-
+  Widget _menu({
+    required BuildContext context,
+    required BrushValuesProvider brushValues,
+  }) {
     return Container(
       margin: EdgeInsets.only(right: 16.0),
       padding: EdgeInsets.all(8.0),
-      height: _animHeght.value,
+      height: _animHeight.value,
       width: _animWidth.value,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -125,47 +113,44 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
       child: Container(
         child: Column(
           children: [
-            BrushType(),
+            BrushType(brushValues),
             _slideItem(
-                text: 'brushWidth',
-                value: _brushWidth,
-                numValue: _brushWidth.toStringAsFixed(1),
-                onChanged: (value) {
-                  _brushWidth = value;
-                  setState(() {});
-                },
-                onChangeEnd: (value) {
-                  _brushValues.brushWidth = value;
-                  setState(() {});
-                }),
+              text: 'brushWidth',
+              value: brushValues.brushWidth,
+              numValue: (brushValues.brushWidth * 10).toStringAsFixed(0),
+              min: 0.1,
+              max: 0.8,
+              onChanged: (value) {
+                brushValues.brushWidth = value;
+              },
+            ),
             _brushColor(
               context: context,
-              color: _brushColorPicker,
+              color: brushValues.colorPicker,
             ),
             _slideItem(
-                text: 'brushOpacity',
-                value: _brushOpacity,
-                numValue: _brushOpacity.toStringAsFixed(1),
-                onChanged: (value) {
-                  _brushOpacity = value;
-                  setState(() {});
-                },
-                onChangeEnd: (value) {
-                  _brushValues.brushOpacity = value;
-                  setState(() {});
-                }),
+              text: 'brushOpacity',
+              value: brushValues.brushOpacity,
+              numValue:
+                  (brushValues.brushOpacity * 100).toStringAsFixed(0) + "%",
+              onChanged: (value) {
+                setState(() {
+                  brushValues.brushOpacity = value;
+                });
+              },
+            ),
             _slideItem(
-                text: 'inkAmount',
-                value: _inkAmount,
-                numValue: (_inkAmount * 100).toStringAsFixed(0),
-                onChanged: (value) {
-                  _inkAmount = value;
-                  setState(() {});
-                },
-                onChangeEnd: (value) {
-                  _brushValues.inkAmount = value;
-                  setState(() {});
-                }),
+              text: 'inkAmount',
+              value: brushValues.inkAmount,
+              numValue: (brushValues.inkAmount * 100).toStringAsFixed(0),
+              max: 0.1,
+              min: 0,
+              onChanged: (value) {
+                setState(() {
+                  brushValues.inkAmount = value;
+                });
+              },
+            ),
           ],
         ),
       ),
@@ -176,11 +161,13 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
 
   /// Model function that handles the editable values of the brush
   Widget _slideItem({
-    @required String text,
-    @required double value,
-    @required Function(double) onChanged,
-    @required String numValue,
-    @required Function(double) onChangeEnd,
+    required String text,
+    required double value,
+    required Function(double) onChanged,
+    required String numValue,
+    double min = 0,
+    double max = 1,
+    // required Function(double) onChangeEnd,
   }) {
     return Expanded(
       child: Row(
@@ -188,8 +175,10 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
           Text(text),
           Flexible(
             child: Slider(
-              onChangeEnd: onChangeEnd,
+              // onChangeEnd: onChangeEnd,
               value: value,
+              min: min,
+              max: max,
               onChanged: onChanged,
             ),
           ),
@@ -200,7 +189,10 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
   }
 
   /// Function that allows to open a color picker to select the color of the brush
-  Widget _brushColor({BuildContext context, @required Color color}) {
+  Widget _brushColor({
+    required BuildContext context,
+    required Color color,
+  }) {
     return Expanded(
       child: Row(
         children: [
@@ -213,51 +205,13 @@ class _MenuWidgetState extends State<MenuWidget> with TickerProviderStateMixin {
                   color: color,
                 ),
                 onTap: () {
-                  _colorPicker(context: context, colorSelect: color);
+                  showDialog(
+                    context: context,
+                    builder: (context) => ColorPickerDialog(startColor: color),
+                  );
                 },
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Function that contains the alert dialog that allows the user to change the color of the brush
-  Future _colorPicker(
-      {BuildContext context, @required Color colorSelect}) async {
-    Color _colorSelected;
-
-    return await showDialog(
-      context: context,
-      child: AlertDialog(
-        title: Text('Pick a color'),
-        content: SingleChildScrollView(
-          child: ColorPicker(
-            pickerColor: colorSelect,
-            onColorChanged: (Color color) {
-              _colorSelected = color;
-              setState(() {});
-            },
-            showLabel: true,
-            pickerAreaHeightPercent: 0.8,
-          ),
-        ),
-        actions: [
-          FlatButton(
-            child: Text('Go it'),
-            onPressed: () {
-              final _brushValues =
-                  Provider.of<BrushValuesProvider>(context, listen: false);
-
-              if (_colorSelected != null) {
-                setState(() {
-                  _brushColorPicker = _colorSelected;
-                  _brushValues.colorPicker = _colorSelected;
-                });
-              }
-              Navigator.pop(context);
-            },
           ),
         ],
       ),
